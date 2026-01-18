@@ -6,7 +6,10 @@ of making this example code executable.
 
 from dataclasses import dataclass
 from enum import StrEnum
+
+import aiohttp
 import logging
+
 from random import choice, randrange
 
 _LOGGER = logging.getLogger(__name__)
@@ -87,11 +90,11 @@ class API:
             'TE': 'trailers',
         }
     
-        async with aiohttp.ClientSession() as session:
-            response = await session.post(url=login_url,
-                                          data=post_data,
-                                          headers=headers)
-            result = await response.json()
+        with aiohttp.ClientSession() as session:
+            response = session.post(url=login_url,
+                                    data=post_data,
+                                    headers=headers)
+            result = response.json()
             if result['code'] == 200:
                 _LOGGER.info("MACVOLT: Login successful!")
                 self.connected = True
