@@ -46,11 +46,11 @@ class Device:
 class API:
     """Class for example API."""
 
-    def __init__(self, host: str, user: str, pass: str) -> None:
+    def __init__(self, host: str, username: str, password: str) -> None:
         """Initialise."""
         self.host = host
-        self.user = user
-        self.pass = pass
+        self.username = username
+        self.password = password
         self.connected: bool = False
         self.token = ''
         self.refresh_token = ''
@@ -58,7 +58,7 @@ class API:
     @property
     def controller_name(self) -> str:
         """Return the name of the controller."""
-        return self.user.replace(".", "_")
+        return self.username.replace(".", "_")
 
     def connect(self) -> bool:
         """Connect to api."""
@@ -66,7 +66,7 @@ class API:
         PATH_LOGIN = config.get([DOMAIN]).get('PATH_LOGIN')
 
         login_url = f'{self.host}{PATH_LOGIN}'
-        post_data = f'{{"username": "{self.user}", "password": "{self.pass}"}}'
+        post_data = f'{{"username": "{self.username}", "password": "{self.password}"}}'
         headers = {
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0',
             'Accept': 'application/json, text/plain, */*',
