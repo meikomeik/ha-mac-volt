@@ -6,7 +6,14 @@ of making this example code executable.
 
 from dataclasses import dataclass
 from enum import StrEnum
+
+import asyncio
+import aiohttp
+import datetime
 import logging
+
+from homeassistant.config_entries import ConfigEntry
+
 from random import choice, randrange
 
 _LOGGER = logging.getLogger(__name__)
@@ -46,9 +53,10 @@ class Device:
 class API:
     """Class for example API."""
 
-    def __init__(self, host: str, username: str, password: str) -> None:
+    #def __init__(self, host: str, username: str, password: str, config_entry: ConfigEntry) -> None:
+    def __init__(self, username: str, password: str) -> None:
         """Initialise."""
-        self.host = host
+        self.host = "https://monitor.macvolt.de/api"
         self.username = username
         self.password = password
         self.connected: bool = False
@@ -60,13 +68,7 @@ class API:
         """Return the name of the controller."""
         return self.username.replace(".", "_")
 
-    def connect(self) -> bool:
-        """Connect to api."""
-
-        PATH_LOGIN = config.get([DOMAIN]).get('PATH_LOGIN')
-
-        login_url = f'{self.host}{PATH_LOGIN}'
-        post_data = f'{{"username": "{self.username}", "password": "{self.password}"}}'
+    def _get_headers(self):
         headers = {
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0',
             'Accept': 'application/json, text/plain, */*',
@@ -86,12 +88,26 @@ class API:
             'Priority': 'u=0',
             'TE': 'trailers',
         }
-    
+        if self.token:
+            headers['Authorization'] = self.token
+        return headers
+
+    async def connect(self) -> bool:
+        """Connect to api."""
+        _LOGGER.info("MACVOLT: connect!")
+
+        PATH_LOGIN = "/usercenter/cloud/user/login"
+
+        login_url = f'{self.host}{PATH_LOGIN}'
+        post_data = f'{{"username": "{self.username}", "password": "{self.password}"}}'
+        headers = self._get_headers()
+        _LOGGER.info(f"MACVOLT: headers={headers}!")
+
         async with aiohttp.ClientSession() as session:
             response = await session.post(url=login_url,
-                                          data=post_data,
-                                          headers=headers)
-            result = await response.json()
+                                    data=post_data,
+                                    headers=headers)
+            result = response.json()
             if result['code'] == 200:
                 _LOGGER.info("MACVOLT: Login successful!")
                 self.connected = True
@@ -105,20 +121,24 @@ class API:
         self.connected = False
         return True
 
-    def get_devices(self) -> list[Device]:
+    async def get_devices(self) -> list[Device]:
         """Get devices on api."""
-        return [
-            Device(
-                device_id=device.get("id"),
-                device_unique_id=self.get_device_unique_id(
-                    device.get("id"), device.get("type")
-                ),
-                device_type=device.get("type"),
-                name=self.get_device_name(device.get("id"), device.get("type")),
-                state=self.get_device_value(device.get("id"), device.get("type")),
-            )
-            for device in DEVICES
-        ]
+        _LOGGER.info("MACVOLT: GET_DEVICES")
+
+        PATH_SYSTEM_SN = "/stable/home/getCustomMenuEssList"
+
+        path_system_sn = f'{self.host}{PATH_SYSTEM_SN}'
+        headers = self._get_headers()
+
+        async with aiohttp.ClientSession() as session:
+            response = await session.get(url=path_system_sn, headers=headers)
+            result = response.json()
+            if result['code'] == 200:
+                _LOGGER.info("MACVOLT: GET_SN successful!")
+                self.system = []
+                for item in result['data']:
+                    self.system.append(item['SystemSn'])
+                _LOGGER.info("MACVOLT: SN {self.system}!")
 
     def get_device_unique_id(self, device_id: str, device_type: DeviceType) -> str:
         """Return a unique device id."""

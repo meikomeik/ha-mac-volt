@@ -26,13 +26,10 @@ from .const import DEFAULT_SCAN_INTERVAL, DOMAIN, MIN_SCAN_INTERVAL
 
 _LOGGER = logging.getLogger(__name__)
 
-# TODO adjust the data schema to the data that you need
-FIXME_TMP_USER = config.get(['hass_mac_volt']).get('username', 'test')
-FIXME_TMP_PASS = config.get(['hass_mac_volt']).get('password', '1234')
 STEP_USER_DATA_SCHEMA = vol.Schema(
     {
-        vol.Required(CONF_USERNAME, description={"suggested_value": FIXME_TMP_USER}): str,
-        vol.Required(CONF_PASSWORD, description={"suggested_value": FIXME_TMP_PASS}): str,
+        vol.Required(CONF_USERNAME, description={"suggested_value": 'Username'}): str,
+        vol.Required(CONF_PASSWORD, description={"suggested_value": 'Password'}): str,
     }
 )
 
@@ -43,9 +40,8 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
     Data has the keys from STEP_USER_DATA_SCHEMA with values provided by the user.
     """
 
-    BASE_URL = config.get([DOMAIN]).get('BASE_RUL', '')
 
-    api = API(BASE_URL, data[CONF_USERNAME], data[CONF_PASSWORD])
+    api = API(data[CONF_USERNAME], data[CONF_PASSWORD])
     try:
         await hass.async_add_executor_job(api.connect)
         # If you cannot connect, raise CannotConnect
@@ -54,7 +50,7 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
         raise InvalidAuth from err
     except APIConnectionError as err:
         raise CannotConnect from err
-    return {"title": f"Example Integration - {data[CONF_HOST]}"}
+    return {"title": f"Example Integration - {data[CONF_USERNAME]}"}
 
 
 class ExampleConfigFlow(ConfigFlow, domain=DOMAIN):
@@ -63,13 +59,13 @@ class ExampleConfigFlow(ConfigFlow, domain=DOMAIN):
     VERSION = 1
     _input_data: dict[str, Any]
 
-    @staticmethod
-    @callback
-    def async_get_options_flow(config_entry):
-        """Get the options flow for this handler."""
-        # Remove this method and the ExampleOptionsFlowHandler class
-        # if you do not want any options for your integration.
-        return ExampleOptionsFlowHandler(config_entry)
+    #@staticmethod
+    #@callback
+    #def async_get_options_flow(config_entry):
+    #    """Get the options flow for this handler."""
+    #    # Remove this method and the ExampleOptionsFlowHandler class
+    #    # if you do not want any options for your integration.
+    #    # return ExampleOptionsFlowHandler(config_entry)
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
@@ -117,7 +113,7 @@ class ExampleConfigFlow(ConfigFlow, domain=DOMAIN):
             self.context["entry_id"]
         )
 
-        if user_input is not None:
+        if user_input is not None and False:
             try:
                 user_input[CONF_HOST] = config_entry.data[CONF_HOST]
                 await validate_input(self.hass, user_input)

@@ -66,7 +66,8 @@ class MacVoltCoordinator(DataUpdateCoordinator):
         )
 
         # Initialise your api here
-        self.api = API(host=self.host, user=self.user, pwd=self.pwd)
+        self.api = API(username=self.user, password=self.pwd)
+        _LOGGER.info(f"MACVOLT: API is: {self.api}!")
 
     async def async_update_data(self):
         """Fetch data from API endpoint.
