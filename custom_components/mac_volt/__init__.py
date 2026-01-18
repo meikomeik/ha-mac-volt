@@ -14,7 +14,7 @@ from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
-#from .coordinator import ExampleCoordinator
+from .coordinator import MacVoltCoordinator
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -33,7 +33,7 @@ class RuntimeData:
 async def async_setup_entry(hass: HomeAssistant, config_entry: MyConfigEntry) -> bool:
     """Set up Example Integration from a config entry."""
 
-    coordinator = ExampleCoordinator(hass, config_entry)
+    coordinator = MacVoltCoordinator(hass, config_entry)
 
     await coordinator.async_config_entry_first_refresh()
 

@@ -12,7 +12,7 @@ from homeassistant.const import (
 from homeassistant.core import DOMAIN, HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
-#from .api import API, APIAuthError, Device, DeviceType
+from .api import API, APIAuthError, Device, DeviceType
 from .const import (
     BASE_URL,
     PATH_LOGIN,
@@ -30,7 +30,7 @@ class MacVoltAPIData:
     devices: list[Device]
 
 
-class ExampleCoordinator(DataUpdateCoordinator):
+class MacVoltCoordinator(DataUpdateCoordinator):
     """My example coordinator."""
 
     data: MacVoltAPIData
