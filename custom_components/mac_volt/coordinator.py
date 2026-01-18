@@ -16,7 +16,8 @@ from .api import API, APIAuthError, Device, DeviceType
 from .const import (
     BASE_URL,
     PATH_LOGIN,
-    UPDATE_INTERVAL,
+    DEFAULT_SCAN_INTERVAL,
+    MIN_SCAN_INTERVAL,
 )
 
 _LOGGER = logging.getLogger(__name__)
