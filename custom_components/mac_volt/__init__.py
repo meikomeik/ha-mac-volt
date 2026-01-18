@@ -48,7 +48,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: MyConfigEntry) ->
 
     config_entry.runtime_data = RuntimeData(coordinator)
 
-    await hass.config_entries.async_forward_entry_setups(config_entry, PLATFORMS)
+    # FIXME:: await hass.config_entries.async_forward_entry_setups(config_entry, PLATFORMS)
 
     return True
 
