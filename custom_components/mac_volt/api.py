@@ -46,11 +46,11 @@ class Device:
 class API:
     """Class for example API."""
 
-    def __init__(self, host: str, user: str, pwd: str) -> None:
+    def __init__(self, host: str, user: str, pass: str) -> None:
         """Initialise."""
         self.host = host
         self.user = user
-        self.pwd = pwd
+        self.pass = pass
         self.connected: bool = False
         self.token = ''
         self.refresh_token = ''
