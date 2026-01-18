@@ -1,8 +1,8 @@
 """Mac Volt Integration"""
 
-import logging
-
 from __future__ import annotations
+
+import logging
 
 from collections.abc import Callable
 from dataclasses import dataclass
